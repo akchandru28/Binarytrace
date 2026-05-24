@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, MessageSquare, Plus, Trash2, Cpu } from 'lucide-react';
+import { LayoutDashboard, MessageSquare, Plus, Trash2, Cpu, Menu, X } from 'lucide-react';
 import ChatPage from './pages/ChatPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import ProviderBadge from './components/ProviderBadge.jsx';
@@ -7,6 +7,7 @@ import { useChat } from './hooks/useChat.js';
 
 export default function App() {
   const [page, setPage] = useState('chat');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const {
     conversations, messages, activeId, streaming, streamingText,
     provider, setProvider,
@@ -19,11 +20,38 @@ export default function App() {
     loadConversations();
   }, [loadConversations]);
 
+  const handleSelectConversation = (id) => {
+    loadConversation(id);
+    setPage('chat');
+    setSidebarOpen(false);
+  };
+
+  const handleNewConversation = () => {
+    newConversation();
+    setPage('chat');
+    setSidebarOpen(false);
+  };
+
+  const handleNavigate = (targetPage) => {
+    setPage(targetPage);
+    setSidebarOpen(false);
+  };
+
   return (
-    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+    <div className="flex h-screen overflow-hidden relative" style={{ background: 'var(--surface)', color: 'var(--text-primary)' }}>
+      {/* Sidebar Backdrop for Mobile */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden transition-opacity duration-300"
+        />
+      )}
+
       {/* ChatGPT-style Left Sidebar */}
       <aside
-        className="w-64 flex flex-col h-full shrink-0 animate-fade-in"
+        className={`fixed md:static inset-y-0 left-0 w-64 flex flex-col h-full shrink-0 transition-transform duration-300 z-50 md:translate-x-0 ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
         style={{
           background: 'var(--sidebar-bg)',
           borderRight: '1px solid var(--border)',
@@ -32,20 +60,30 @@ export default function App() {
         {/* Sidebar Header */}
         <div className="p-4 flex flex-col gap-3.5" style={{ borderBottom: '1px solid var(--border)' }}>
           {/* Logo and Brand Name */}
-          <div className="flex items-center gap-2">
-            <div
-              className="w-7 h-7 rounded-lg flex items-center justify-center cursor-default shrink-0"
-              style={{
-                background: 'var(--accent-glow)',
-                border: '1px solid var(--accent)',
-              }}
-              title="Binary trace"
-            >
-              <span className="text-accent text-xs font-mono font-black">B</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-7 h-7 rounded-lg flex items-center justify-center cursor-default shrink-0"
+                style={{
+                  background: 'var(--accent-glow)',
+                  border: '1px solid var(--accent)',
+                }}
+                title="Binary trace"
+              >
+                <span className="text-accent text-xs font-mono font-black">B</span>
+              </div>
+              <span className="text-xs font-mono tracking-wider uppercase font-bold text-[var(--text-primary)] whitespace-nowrap">
+                Binary trace
+              </span>
             </div>
-            <span className="text-xs font-mono tracking-wider uppercase font-bold text-[var(--text-primary)] whitespace-nowrap">
-              Binary trace
-            </span>
+            
+            {/* Close Sidebar Button for Mobile */}
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="md:hidden p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-surface-200"
+            >
+              <X size={16} />
+            </button>
           </div>
 
           {/* Model Selector & New Session Button */}
@@ -54,10 +92,7 @@ export default function App() {
               <ProviderBadge provider={provider} onChange={setProvider} />
             </div>
             <button
-              onClick={() => {
-                newConversation();
-                setPage('chat');
-              }}
+              onClick={handleNewConversation}
               className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all active:scale-[0.98] hover:opacity-90 shrink-0"
               style={{
                 background: 'var(--accent)',
@@ -84,10 +119,7 @@ export default function App() {
             return (
               <div
                 key={c._id}
-                onClick={() => {
-                  loadConversation(c._id);
-                  setPage('chat');
-                }}
+                onClick={() => handleSelectConversation(c._id)}
                 className="group flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg cursor-pointer text-xs transition-all duration-150"
                 style={{
                   background: isActive ? 'var(--surface-200)' : 'transparent',
@@ -133,7 +165,7 @@ export default function App() {
         {/* Sidebar Navigation */}
         <div className="p-3 border-t border-[var(--border)] flex flex-col gap-1.5 bg-[var(--sidebar-bg)]">
           <button
-            onClick={() => setPage('chat')}
+            onClick={() => handleNavigate('chat')}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all"
             style={{
               background: page === 'chat' ? 'var(--accent-glow)' : 'transparent',
@@ -157,7 +189,7 @@ export default function App() {
             <span>Chat</span>
           </button>
           <button
-            onClick={() => setPage('dashboard')}
+            onClick={() => handleNavigate('dashboard')}
             className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all"
             style={{
               background: page === 'dashboard' ? 'var(--accent-glow)' : 'transparent',
@@ -184,18 +216,44 @@ export default function App() {
       </aside>
 
       {/* Page Content */}
-      <div className="flex-1 min-w-0 h-screen overflow-hidden">
-        {page === 'chat' ? (
-          <ChatPage
-            messages={messages}
-            streaming={streaming}
-            streamingText={streamingText}
-            sendMessage={sendMessage}
-            cancel={cancel}
-          />
-        ) : (
-          <DashboardPage />
-        )}
+      <div className="flex-1 min-w-0 h-screen flex flex-col overflow-hidden">
+        {/* Mobile Top Header */}
+        <header className="md:hidden flex items-center justify-between h-14 px-4 border-b border-[var(--border)] shrink-0 bg-[var(--header-bg)] backdrop-blur-sm z-30">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-1.5 rounded-lg text-[var(--text-secondary)] hover:bg-surface-200 transition-colors"
+            >
+              <Menu size={20} />
+            </button>
+            <span className="text-sm font-mono tracking-wider uppercase font-bold text-[var(--text-primary)]">
+              {page === 'chat' ? 'Chat' : 'Dashboard'}
+            </span>
+          </div>
+          
+          <button
+            onClick={handleNewConversation}
+            className="flex items-center justify-center p-1.5 rounded-lg text-white transition-all active:scale-95"
+            style={{ background: 'var(--accent)' }}
+          >
+            <Plus size={16} />
+          </button>
+        </header>
+
+        {/* Content View */}
+        <div className="flex-1 min-w-0 overflow-hidden relative">
+          {page === 'chat' ? (
+            <ChatPage
+              messages={messages}
+              streaming={streaming}
+              streamingText={streamingText}
+              sendMessage={sendMessage}
+              cancel={cancel}
+            />
+          ) : (
+            <DashboardPage />
+          )}
+        </div>
       </div>
     </div>
   );

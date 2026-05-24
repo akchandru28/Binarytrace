@@ -52,9 +52,9 @@ export default function DashboardPage() {
   const { summary, latencyTrend, providerBreakdown } = data;
 
   return (
-    <div className="h-full overflow-y-auto p-8 space-y-8 bg-surface">
+    <div className="h-full overflow-y-auto p-4 sm:p-8 space-y-6 sm:space-y-8 bg-surface">
       {/* Top Header */}
-      <div className="flex items-center justify-between border-b border-surface-300 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-300 pb-5">
         <div className="space-y-1">
           <h1 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">System Analytics</h1>
           <div className="flex items-center gap-2">
@@ -68,7 +68,7 @@ export default function DashboardPage() {
         
         <button onClick={fetchData}
           disabled={refreshing}
-          className="text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 transition-all border border-surface-300 bg-surface-100 hover:bg-surface-200 px-3 py-1.5 rounded-md flex items-center gap-2 shadow-sm">
+          className="w-full sm:w-auto justify-center text-xs font-mono text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-50 transition-all border border-surface-300 bg-surface-100 hover:bg-surface-200 px-3 py-1.5 rounded-md flex items-center gap-2 shadow-sm">
           <RefreshCw size={13} className={refreshing ? "animate-spin text-accent" : "text-zinc-500"} />
           <span>{refreshing ? 'Syncing...' : 'Sync Traces'}</span>
         </button>

@@ -14,9 +14,9 @@ export default function ChatWindow({ messages, streaming, streamingText, onSendP
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, streamingText]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-6">
+    <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6">
       {messages.length === 0 && !streaming && (
-        <div className="h-full flex flex-col items-center justify-center max-w-2xl mx-auto gap-8">
+        <div className="min-h-[70vh] flex flex-col items-center justify-center max-w-2xl mx-auto gap-6 sm:gap-8 py-6">
           {/* Hero */}
           <div className="text-center space-y-3">
             <div
