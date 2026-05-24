@@ -2,6 +2,8 @@
 
 BinaryTrace is a lightweight full-stack LLM observability platform built for real-time inference monitoring, telemetry ingestion, and multi-provider AI interactions.
 
+LIVE :https://binarytrace.vercel.app
+
 The platform supports:
 
 * Multi-turn conversational chat
