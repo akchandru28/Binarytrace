@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-platform-server
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: llm-platform-server
+  template:
+    metadata:
+      labels:
+        app: llm-platform-server
+    spec:
+      containers:
+      - name: llm-platform-server
+        image: llm-platform-server:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 4000
+        envFrom:
+        - secretRef:
+            name: llm-secrets
+        - configMapRef:
+            name: llm-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-platform-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 4000
+    targetPort: 4000
+  selector:
+    app: llm-platform-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-platform-client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: llm-platform-client
+  template:
+    metadata:
+      labels:
+        app: llm-platform-client
+    spec:
+      containers:
+      - name: llm-platform-client
+        image: llm-platform-client:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5173
+        env:
+        - name: VITE_API_URL
+          value: "http://localhost:4000/api" # Should be updated to real domain in production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-platform-client
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 5173
+  selector:
+    app: llm-platform-client
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-config
+data:
+  PORT: "4000"
+  CLIENT_URL: "http://localhost:80"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: llm-secrets
+type: Opaque
+stringData:
+  MONGODB_URI: "mongodb+srv://replace-with-your-uri"
+  GEMINI_API_KEY: "replace-with-your-key"
+  OPENAI_API_KEY: "replace-with-your-key"

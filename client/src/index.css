@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --surface:     #f8fafc;
+    --surface-100: #ffffff;
+    --surface-200: #f1f5f9;
+    --surface-300: #cbd5e1;
+    --text-primary:   #0f172a;
+    --text-secondary: #64748b;
+    --accent:      #4f46e5;
+    --accent-dim:  #4338ca;
+    --accent-glow: rgba(79, 70, 229, 0.08);
+    --border:      #e2e8f0;
+    --sidebar-bg:  #f1f5f9;
+    --header-bg:   rgba(255, 255, 255, 0.85);
+  }
+}
+
+/* ── BASE ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 16px; }
+
+body {
+  background-color: var(--surface);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-300); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+/* ── SMOOTH GLOWING CURSOR for streaming ── */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  50% { opacity: 0.35; transform: scaleY(0.85); }
+}
+.cursor-blink::after {
+  content: '';
+  display: inline-block;
+  width: 3.5px;
+  height: 1.15em;
+  background: linear-gradient(180deg, var(--accent), var(--accent-dim));
+  box-shadow: 0 0 8px var(--accent);
+  animation: pulse-glow 0.8s ease-in-out infinite;
+  margin-left: 4px;
+  vertical-align: middle;
+  border-radius: 99px;
+}
+
+/* ── MESSAGE ENTRANCE ANIMATION ── */
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-message {
+  animation: slide-up-fade 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ── MARKDOWN PROSE inside AI bubbles ── */
+.prose-chat {
+  line-height: 1.7;
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+}
+.prose-chat h1,
+.prose-chat h2,
+.prose-chat h3 {
+  font-weight: 700;
+  margin-top: 1.25em;
+  margin-bottom: 0.4em;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.prose-chat h1 { font-size: 1.25em; }
+.prose-chat h2 { font-size: 1.1em; }
+.prose-chat h3 { font-size: 1em; }
+.prose-chat p { margin: 0.6em 0; }
+.prose-chat p:first-child { margin-top: 0; }
+.prose-chat p:last-child  { margin-bottom: 0; }
+
+.prose-chat strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.prose-chat em { font-style: italic; }
+
+.prose-chat ul, .prose-chat ol {
+  padding-left: 1.4em;
+  margin: 0.5em 0;
+}
+.prose-chat ul { list-style-type: disc; }
+.prose-chat ol { list-style-type: decimal; }
+.prose-chat li { margin: 0.2em 0; }
+.prose-chat li > p { margin: 0; }
+
+.prose-chat a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Inline code */
+.prose-chat code:not(pre code) {
+  background: var(--surface-200);
+  border: 1px solid var(--border);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.8em;
+  padding: 0.15em 0.45em;
+  border-radius: 5px;
+}
+
+/* Block code */
+.prose-chat pre {
+  background: var(--surface-200);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1em 1.2em;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+.prose-chat pre code {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.82em;
+  padding: 0;
+}
+
+/* Blockquote */
+.prose-chat blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 0.75em 0;
+  padding: 0.25em 1em;
+  color: var(--text-secondary);
+  background: var(--accent-glow);
+  border-radius: 0 6px 6px 0;
+}
+
+/* Horizontal rule */
+.prose-chat hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1em 0;
+}
+
+/* Tables */
+.prose-chat table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875em;
+  margin: 0.75em 0;
+}
+.prose-chat th, .prose-chat td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.75em;
+  text-align: left;
+}
+.prose-chat th {
+  background: var(--surface-200);
+  font-weight: 600;
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
